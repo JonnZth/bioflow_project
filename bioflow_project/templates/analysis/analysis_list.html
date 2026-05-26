@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% block title %}Análises{% endblock %}
+{% block page_title %}<i class="fas fa-chart-bar me-2 text-primary"></i>Análises{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'analysis:analysis_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Nova Análise</a>
+{% endblock %}
+{% block content %}
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  {% for v,l in type_choices %}
+  <a href="?type={{ v }}" class="badge px-3 py-2 text-decoration-none {% if type == v %}bg-primary text-white{% else %}bg-light text-dark{% endif %}">{{ l }}</a>
+  {% endfor %}
+  {% if type %}<a href="?" class="btn btn-sm btn-outline-secondary py-1">Limpar</a>{% endif %}
+</div>
+
+<div class="bioflow-table">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Nome</th><th>Tipo</th><th>Experimento</th>
+        <th>Analista</th><th>Data</th><th>Resultado</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for a in analyses %}
+    <tr>
+      <td><div class="fw-semibold">{{ a.name }}</div></td>
+      <td><span class="badge bg-light text-dark border">{{ a.get_analysis_type_display }}</span></td>
+      <td>
+        <a href="{% url 'experiments:experiment_detail' a.experiment.pk %}" class="text-primary text-decoration-none small">
+          {{ a.experiment.title|truncatechars:40 }}
+        </a>
+      </td>
+      <td><small>{{ a.analyst.get_full_name|default:a.analyst.username|default:"—" }}</small></td>
+      <td><small>{{ a.analysis_date|date:"d/m/Y" }}</small></td>
+      <td>
+        {% if a.numeric_result %}
+        <span class="fw-bold text-primary">{{ a.numeric_result }}</span>
+        <small class="text-muted ms-1">{{ a.result_unit }}</small>
+        {% elif a.result_file %}
+        <a href="{{ a.result_file.url }}" class="btn btn-xs btn-outline-success py-0 px-2" target="_blank"><i class="fas fa-download me-1"></i>Arquivo</a>
+        {% else %}
+        <span class="text-muted">—</span>
+        {% endif %}
+      </td>
+      <td>
+        <a href="{% url 'analysis:analysis_detail' a.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2"><i class="fas fa-eye"></i></a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center py-5 text-muted">
+      <i class="fas fa-chart-bar fa-2x d-block mb-2 opacity-25"></i>
+      Nenhuma análise registrada.
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

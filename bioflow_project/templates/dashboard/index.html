@@ -1,0 +1,203 @@
+{% extends 'base/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}<i class="fas fa-chart-line me-2 text-primary"></i>Dashboard{% endblock %}
+{% block topbar_actions %}
+<span class="badge bg-success">Sistema Online</span>
+{% endblock %}
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon" style="background:#dbeafe;"><i class="fas fa-microscope text-primary fs-5"></i></div>
+                <span class="badge bg-primary">Ativos</span>
+            </div>
+            <div class="stat-value">{{ active_experiments }}</div>
+            <div class="stat-label">Experimentos Ativos</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon" style="background:#dcfce7;"><i class="fas fa-tools text-success fs-5"></i></div>
+                <span class="badge bg-success">Disponíveis</span>
+            </div>
+            <div class="stat-value">{{ available_equipments }}</div>
+            <div class="stat-label">Equipamentos Disponíveis</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon" style="background:#f3e8ff;"><i class="fas fa-atom text-purple fs-5" style="color:#7c3aed;"></i></div>
+            </div>
+            <div class="stat-value">{{ total_reagents }}</div>
+            <div class="stat-label">Reagentes Cadastrados</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon" style="background:#fef3c7;"><i class="fas fa-chart-bar fs-5" style="color:#d97706;"></i></div>
+            </div>
+            <div class="stat-value">{{ total_analyses }}</div>
+            <div class="stat-label">Análises Realizadas</div>
+        </div>
+    </div>
+</div>
+
+<!-- Alertas -->
+{% if expired_reagents or expiring_reagents or low_stock_reagents %}
+<div class="row g-3 mb-4">
+    {% if expired_reagents %}
+    <div class="col-md-4">
+        <div class="card border-danger" style="border-radius:12px;">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                    <strong class="text-danger">Reagentes Vencidos ({{ expired_reagents|length }})</strong>
+                </div>
+                {% for r in expired_reagents %}<div class="small text-muted">{{ r.name }}</div>{% endfor %}
+                <a href="{% url 'reagents:reagent_list' %}?alert=expired" class="btn btn-sm btn-outline-danger mt-2">Ver todos</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if expiring_reagents %}
+    <div class="col-md-4">
+        <div class="card border-warning" style="border-radius:12px;">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fas fa-clock text-warning"></i>
+                    <strong class="text-warning">Vencendo em Breve ({{ expiring_reagents|length }})</strong>
+                </div>
+                {% for r in expiring_reagents %}<div class="small text-muted">{{ r.name }} — {{ r.expiration_date|date:"d/m/Y" }}</div>{% endfor %}
+                <a href="{% url 'reagents:reagent_list' %}?alert=expiring" class="btn btn-sm btn-outline-warning mt-2">Ver todos</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if low_stock_reagents %}
+    <div class="col-md-4">
+        <div class="card border-info" style="border-radius:12px;">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fas fa-battery-quarter text-info"></i>
+                    <strong class="text-info">Estoque Baixo ({{ low_stock_reagents|length }})</strong>
+                </div>
+                {% for r in low_stock_reagents %}<div class="small text-muted">{{ r.name }} — {{ r.quantity }} {{ r.unit }}</div>{% endfor %}
+                <a href="{% url 'reagents:reagent_list' %}?alert=low" class="btn btn-sm btn-outline-info mt-2">Ver todos</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+    <!-- Agendamentos do Dia -->
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+            <div class="card-header bg-white border-bottom" style="border-radius:12px 12px 0 0;padding:1rem 1.25rem;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong><i class="fas fa-calendar-day me-2 text-primary"></i>Agendamentos de Hoje</strong>
+                    <a href="{% url 'schedules:schedule_list' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if today_schedules %}
+                <div class="list-group list-group-flush">
+                    {% for s in today_schedules %}
+                    <div class="list-group-item px-4 py-3">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="fw-600">{{ s.equipment.name }}</div>
+                                <small class="text-muted">{{ s.user.get_full_name|default:s.user.username }} — {{ s.start_datetime|time:"H:i" }} às {{ s.end_datetime|time:"H:i" }}</small>
+                            </div>
+                            <span class="badge bg-primary align-self-center">Confirmado</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>Nenhum agendamento para hoje
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Experimentos Recentes -->
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+            <div class="card-header bg-white border-bottom" style="border-radius:12px 12px 0 0;padding:1rem 1.25rem;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong><i class="fas fa-microscope me-2 text-primary"></i>Experimentos Recentes</strong>
+                    <a href="{% url 'experiments:experiment_create' %}" class="btn btn-sm btn-primary">+ Novo</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_experiments %}
+                <div class="list-group list-group-flush">
+                    {% for e in recent_experiments %}
+                    <a href="{% url 'experiments:experiment_detail' e.pk %}" class="list-group-item list-group-item-action px-4 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold text-dark">{{ e.title|truncatechars:40 }}</div>
+                                <small class="text-muted">{{ e.responsible.get_full_name|default:e.responsible.username|default:"—" }}</small>
+                            </div>
+                            <span class="badge status-{{ e.status }} px-2 py-1" style="border-radius:6px;">{{ e.get_status_display }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">Nenhum experimento cadastrado</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;padding:1.25rem;">
+            <strong class="mb-3 d-block"><i class="fas fa-chart-doughnut me-2 text-primary"></i>Análises por Tipo</strong>
+            <canvas id="analysisChart" height="200"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;padding:1.25rem;">
+            <strong class="mb-3 d-block"><i class="fas fa-chart-bar me-2 text-primary"></i>Experimentos por Status</strong>
+            <canvas id="expStatusChart" height="200"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const labels = {{ chart_labels|safe }};
+const data = {{ chart_data|safe }};
+const expStatus = {{ exp_by_status|safe }};
+
+if(labels.length > 0){
+    new Chart(document.getElementById('analysisChart'),{
+        type:'doughnut',
+        data:{labels,datasets:[{data,backgroundColor:['#0d6efd','#0284c7','#7c3aed','#16a34a','#d97706','#dc2626','#64748b','#0f172a']}]},
+        options:{responsive:true,plugins:{legend:{position:'bottom'}}}
+    });
+}
+if(expStatus.length > 0){
+    new Chart(document.getElementById('expStatusChart'),{
+        type:'bar',
+        data:{
+            labels:expStatus.map(e=>e.status),
+            datasets:[{label:'Experimentos',data:expStatus.map(e=>e.total),backgroundColor:'#0d6efd',borderRadius:6}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+    });
+}
+</script>
+{% endblock %}

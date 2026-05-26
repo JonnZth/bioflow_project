@@ -1,0 +1,69 @@
+{% extends 'base/base.html' %}
+{% block title %}Amostras{% endblock %}
+{% block page_title %}<i class="fas fa-vial me-2 text-primary"></i>Amostras{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'samples:sample_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Nova Amostra</a>
+{% endblock %}
+{% block content %}
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  {% for v,l in status_choices %}
+  <a href="?status={{ v }}" class="badge px-3 py-2 text-decoration-none {% if status == v %}bg-primary text-white{% else %}bg-light text-dark{% endif %}">{{ l }}</a>
+  {% endfor %}
+  {% if status %}<a href="?" class="btn btn-sm btn-outline-secondary py-1">Limpar</a>{% endif %}
+</div>
+
+<div class="mb-3">
+  <form class="d-flex gap-2" method="get">
+    <input name="q" class="form-control form-control-sm" style="max-width:320px;" placeholder="Buscar por nome ou código..." value="{{ q }}">
+    <button class="btn btn-primary btn-sm">Buscar</button>
+    <a href="?" class="btn btn-outline-secondary btn-sm">Limpar</a>
+  </form>
+</div>
+
+<div class="bioflow-table">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Código</th><th>Nome/Descrição</th><th>Tipo</th>
+        <th>Responsável</th><th>Coleta</th><th>Armazenamento</th><th>Status</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for s in samples %}
+    <tr>
+      <td><code class="text-primary fw-bold">{{ s.code }}</code></td>
+      <td>
+        <div class="fw-semibold">{{ s.name|truncatechars:45 }}</div>
+        {% if s.origin %}<small class="text-muted">{{ s.origin|truncatechars:40 }}</small>{% endif %}
+      </td>
+      <td><span class="badge bg-light text-dark">{{ s.get_sample_type_display }}</span></td>
+      <td><small>{{ s.responsible.get_full_name|default:s.responsible.username|default:"—" }}</small></td>
+      <td><small>{{ s.collection_date|date:"d/m/Y" }}</small></td>
+      <td>
+        <small>
+          {% if s.storage_location == 'freezer_20' %}<i class="fas fa-snowflake text-info me-1"></i>
+          {% elif s.storage_location == 'fridge_4' %}<i class="fas fa-temperature-low text-primary me-1"></i>
+          {% else %}<i class="fas fa-box text-muted me-1"></i>{% endif %}
+          {{ s.get_storage_location_display }}
+        </small>
+      </td>
+      <td>
+        {% if s.status == 'active' %}<span class="badge bg-success px-2 py-1" style="border-radius:6px;">Ativa</span>
+        {% elif s.status == 'consumed' %}<span class="badge bg-warning text-dark px-2 py-1" style="border-radius:6px;">Consumida</span>
+        {% elif s.status == 'discarded' %}<span class="badge bg-danger px-2 py-1" style="border-radius:6px;">Descartada</span>
+        {% else %}<span class="badge bg-secondary px-2 py-1" style="border-radius:6px;">Arquivada</span>{% endif %}
+      </td>
+      <td>
+        <a href="{% url 'samples:sample_detail' s.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2"><i class="fas fa-eye"></i></a>
+        <a href="{% url 'samples:sample_edit' s.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="fas fa-edit"></i></a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8" class="text-center py-5 text-muted">
+      <i class="fas fa-vial fa-2x d-block mb-2 opacity-25"></i>Nenhuma amostra cadastrada.
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

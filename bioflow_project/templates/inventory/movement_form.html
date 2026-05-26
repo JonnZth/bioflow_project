@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+{% block title %}Nova Movimentação{% endblock %}
+{% block page_title %}<i class="fas fa-exchange-alt me-2 text-primary"></i>Registrar Movimentação de Estoque{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card" style="border-radius:16px;border:1px solid #e2e8f0;">
+      <div class="card-body p-4">
+        <div class="alert alert-warning py-2 mb-4" style="border-radius:10px;">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          O sistema impede estoque negativo. Saídas maiores que o estoque atual serão bloqueadas.
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors.as_text }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Registrar</button>
+            <a href="{% url 'inventory:movement_list' %}" class="btn btn-outline-secondary px-4">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

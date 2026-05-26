@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+{% block title %}Equipamentos{% endblock %}
+{% block page_title %}<i class="fas fa-tools me-2 text-primary"></i>Equipamentos{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'equipments:equipment_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Novo Equipamento</a>
+{% endblock %}
+{% block content %}
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    {% for v,l in status_choices %}<a href="?status={{ v }}" class="badge px-3 py-2 text-decoration-none {% if status == v %}bg-primary text-white{% else %}bg-light text-dark{% endif %}">{{ l }}</a>{% endfor %}
+    {% if status %}<a href="?" class="btn btn-sm btn-outline-secondary py-1">Limpar</a>{% endif %}
+</div>
+<div class="bioflow-table">
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Nome</th><th>Modelo</th><th>Nº Série</th><th>Localização</th><th>Status</th><th>Manutenção</th><th>Ações</th></tr></thead>
+        <tbody>
+        {% for eq in equipments %}
+        <tr>
+            <td><strong>{{ eq.name }}</strong></td>
+            <td>{{ eq.model }}</td>
+            <td><code>{{ eq.serial_number }}</code></td>
+            <td><small>{{ eq.location }}</small></td>
+            <td><span class="badge status-{{ eq.status }} px-2 py-1" style="border-radius:6px;">{{ eq.get_status_display }}</span></td>
+            <td><small class="{% if not eq.maintenance_date %}text-muted{% endif %}">{{ eq.maintenance_date|date:"d/m/Y"|default:"—" }}</small></td>
+            <td>
+                <a href="{% url 'equipments:equipment_detail' eq.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2"><i class="fas fa-eye"></i></a>
+                <a href="{% url 'equipments:equipment_edit' eq.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="fas fa-edit"></i></a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center py-4 text-muted">Nenhum equipamento cadastrado.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

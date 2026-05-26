@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ experiment.title }}{% endblock %}
+{% block page_title %}{{ experiment.title|truncatechars:40 }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'experiments:experiment_edit' experiment.pk %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit me-1"></i>Editar</a>
+<a href="{% url 'analysis:analysis_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Nova Análise</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3" style="border-radius:12px;border:1px solid #e2e8f0;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="badge status-{{ experiment.status }} px-3 py-2 fs-6" style="border-radius:8px;">{{ experiment.get_status_display }}</span>
+                    <small class="text-muted">Início: {{ experiment.start_date|date:"d/m/Y" }}</small>
+                </div>
+                <h5 class="fw-bold">Descrição</h5>
+                <p>{{ experiment.description }}</p>
+                {% if experiment.hypothesis %}<h5 class="fw-bold mt-3">Hipótese</h5><p>{{ experiment.hypothesis }}</p>{% endif %}
+                {% if experiment.results_summary %}<h5 class="fw-bold mt-3">Resultados</h5><p>{{ experiment.results_summary }}</p>{% endif %}
+                {% if experiment.conclusions %}<h5 class="fw-bold mt-3">Conclusões</h5><p>{{ experiment.conclusions }}</p>{% endif %}
+            </div>
+        </div>
+        <!-- Análises -->
+        <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+            <div class="card-header bg-white px-4 py-3"><strong><i class="fas fa-chart-bar me-2 text-primary"></i>Análises ({{ analyses.count }})</strong></div>
+            <div class="card-body p-0">
+                {% if analyses %}
+                <div class="list-group list-group-flush">
+                {% for a in analyses %}
+                <a href="{% url 'analysis:analysis_detail' a.pk %}" class="list-group-item list-group-item-action px-4 py-3">
+                    <div class="d-flex justify-content-between">
+                        <div><div class="fw-semibold">{{ a.name }}</div><small class="text-muted">{{ a.analysis_date|date:"d/m/Y" }} — {{ a.get_analysis_type_display }}</small></div>
+                        {% if a.numeric_result %}<div class="fw-bold text-primary">{{ a.numeric_result }} {{ a.result_unit }}</div>{% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+                </div>
+                {% else %}<div class="text-center py-4 text-muted">Nenhuma análise registrada</div>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card mb-3" style="border-radius:12px;border:1px solid #e2e8f0;">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.05em;">Informações</h6>
+                <div class="mb-2"><small class="text-muted">Responsável</small><div class="fw-semibold">{{ experiment.responsible.get_full_name|default:experiment.responsible.username|default:"—" }}</div></div>
+                <div class="mb-2"><small class="text-muted">Protocolo</small><div class="fw-semibold">{{ experiment.protocol.title|default:"—" }}</div></div>
+                <div class="mb-2"><small class="text-muted">Reagentes</small><div class="fw-semibold">{{ experiment.reagents.count }} cadastrados</div></div>
+                <div class="mb-2"><small class="text-muted">Amostras</small><div class="fw-semibold">{{ experiment.samples.count }} cadastradas</div></div>
+                <div class="mb-2"><small class="text-muted">Participantes</small><div class="fw-semibold">{{ experiment.participants.count }}</div></div>
+                {% if experiment.attachment %}<div class="mt-3"><a href="{{ experiment.attachment.url }}" class="btn btn-sm btn-outline-secondary w-100"><i class="fas fa-download me-1"></i>Baixar Anexo</a></div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

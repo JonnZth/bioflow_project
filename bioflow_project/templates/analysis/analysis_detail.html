@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ analysis.name }}{% endblock %}
+{% block page_title %}{{ analysis.name }}{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-body p-4">
+        <div class="d-flex gap-2 mb-4">
+          <span class="badge bg-primary px-3 py-2">{{ analysis.get_analysis_type_display }}</span>
+          <span class="badge bg-light text-dark border px-3 py-2">{{ analysis.analysis_date|date:"d/m/Y" }}</span>
+        </div>
+
+        {% if analysis.numeric_result %}
+        <div class="p-4 mb-4 text-center" style="background:linear-gradient(135deg,#dbeafe,#ede9fe);border-radius:12px;">
+          <div style="font-size:2.5rem;font-weight:900;color:#0d6efd;">{{ analysis.numeric_result }}</div>
+          <div class="text-muted fw-semibold">{{ analysis.result_unit }}</div>
+        </div>
+        {% endif %}
+
+        {% if analysis.description %}
+        <h6 class="fw-bold">Descrição Técnica</h6>
+        <p class="text-muted">{{ analysis.description }}</p>
+        {% endif %}
+
+        {% if analysis.observations %}
+        <h6 class="fw-bold mt-3">Observações</h6>
+        <div class="p-3 bg-light rounded">{{ analysis.observations }}</div>
+        {% endif %}
+
+        {% if analysis.result_file %}
+        <div class="mt-3">
+          <a href="{{ analysis.result_file.url }}" class="btn btn-outline-success" target="_blank">
+            <i class="fas fa-download me-2"></i>Baixar Arquivo de Resultado
+          </a>
+        </div>
+        {% endif %}
+        {% if analysis.result_image %}
+        <div class="mt-3">
+          <h6 class="fw-bold">Imagem do Resultado</h6>
+          <img src="{{ analysis.result_image.url }}" class="img-fluid rounded" style="max-height:300px;" alt="Resultado">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-body p-4">
+        <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size:.7rem;letter-spacing:.08em;">Informações</h6>
+        <div class="mb-3">
+          <small class="text-muted d-block">Experimento</small>
+          <a href="{% url 'experiments:experiment_detail' analysis.experiment.pk %}" class="fw-semibold text-primary text-decoration-none">
+            {{ analysis.experiment.title|truncatechars:40 }}
+          </a>
+        </div>
+        <div class="mb-3">
+          <small class="text-muted d-block">Analista</small>
+          <div class="fw-semibold">{{ analysis.analyst.get_full_name|default:analysis.analyst.username|default:"—" }}</div>
+        </div>
+        {% if analysis.equipment_used %}
+        <div class="mb-3">
+          <small class="text-muted d-block">Equipamento</small>
+          <div class="fw-semibold">{{ analysis.equipment_used.name }}</div>
+          <small class="text-muted">{{ analysis.equipment_used.model }}</small>
+        </div>
+        {% endif %}
+        <div class="mb-3">
+          <small class="text-muted d-block">Registrado em</small>
+          <div class="fw-semibold">{{ analysis.created_at|date:"d/m/Y H:i" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ sample.code }}{% endblock %}
+{% block page_title %}<code class="text-primary">{{ sample.code }}</code> — {{ sample.name|truncatechars:35 }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'samples:sample_edit' sample.pk %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit me-1"></i>Editar</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card mb-3" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-header bg-white px-4 py-3 border-bottom">
+        <div class="d-flex gap-3 align-items-center">
+          <span class="badge bg-primary fs-6 px-3"><i class="fas fa-vial me-1"></i>{{ sample.get_sample_type_display }}</span>
+          {% if sample.status == 'active' %}<span class="badge bg-success px-3">Ativa</span>
+          {% elif sample.status == 'consumed' %}<span class="badge bg-warning text-dark px-3">Consumida</span>
+          {% elif sample.status == 'discarded' %}<span class="badge bg-danger px-3">Descartada</span>
+          {% else %}<span class="badge bg-secondary px-3">Arquivada</span>{% endif %}
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">{{ sample.name }}</h5>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Código Único</small>
+            <code class="text-primary fw-bold fs-5">{{ sample.code }}</code>
+          </div>
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Responsável</small>
+            <span class="fw-semibold">{{ sample.responsible.get_full_name|default:sample.responsible.username|default:"—" }}</span>
+          </div>
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Data de Coleta</small>
+            <span class="fw-semibold">{{ sample.collection_date|date:"d/m/Y" }}</span>
+          </div>
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Armazenamento</small>
+            <span class="fw-semibold">{{ sample.get_storage_location_display }}</span>
+            {% if sample.storage_details %}<br><small class="text-muted">{{ sample.storage_details }}</small>{% endif %}
+          </div>
+          {% if sample.origin %}
+          <div class="col-12">
+            <small class="text-muted d-block">Origem</small>
+            <p class="mb-0">{{ sample.origin }}</p>
+          </div>
+          {% endif %}
+          {% if sample.notes %}
+          <div class="col-12">
+            <small class="text-muted d-block">Observações</small>
+            <p class="mb-0 p-3 bg-light rounded">{{ sample.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-body p-4">
+        <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size:.7rem;letter-spacing:.08em;">Rastreamento</h6>
+        <div class="mb-3">
+          <small class="text-muted">Cadastrada em</small>
+          <div class="fw-semibold">{{ sample.created_at|date:"d/m/Y H:i" }}</div>
+        </div>
+        <hr>
+        <small class="text-muted d-block mb-2">Experimentos associados</small>
+        {% with exps=sample.experiment_set.all %}
+        {% if exps %}
+          {% for e in exps %}
+          <a href="{% url 'experiments:experiment_detail' e.pk %}" class="d-block text-decoration-none mb-1">
+            <span class="badge bg-light text-dark border w-100 text-start py-2 px-3">
+              <i class="fas fa-microscope me-1 text-primary"></i>{{ e.title|truncatechars:30 }}
+            </span>
+          </a>
+          {% endfor %}
+        {% else %}
+          <small class="text-muted">Nenhum experimento vinculado</small>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

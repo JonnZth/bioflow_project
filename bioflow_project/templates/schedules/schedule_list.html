@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+{% block title %}Agendamentos{% endblock %}
+{% block page_title %}<i class="fas fa-calendar-alt me-2 text-primary"></i>Agendamentos{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'schedules:schedule_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Novo Agendamento</a>
+{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <form class="d-flex gap-2 flex-wrap" method="get">
+    <input name="equipment" class="form-control form-control-sm" style="max-width:280px;" placeholder="Filtrar por equipamento..." value="{{ equipment }}">
+    <button class="btn btn-primary btn-sm">Filtrar</button>
+    <a href="?" class="btn btn-outline-secondary btn-sm">Limpar</a>
+  </form>
+</div>
+
+<div class="bioflow-table">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Equipamento</th>
+        <th>Usuário</th>
+        <th>Início</th>
+        <th>Fim</th>
+        <th>Finalidade</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for s in schedules %}
+    <tr>
+      <td>
+        <div class="fw-semibold">{{ s.equipment.name }}</div>
+        <small class="text-muted">{{ s.equipment.model }}</small>
+      </td>
+      <td>
+        <div>{{ s.user.get_full_name|default:s.user.username }}</div>
+        <small class="text-muted">{{ s.user.get_role_display }}</small>
+      </td>
+      <td>
+        <div>{{ s.start_datetime|date:"d/m/Y" }}</div>
+        <small class="text-muted">{{ s.start_datetime|time:"H:i" }}</small>
+      </td>
+      <td>
+        <div>{{ s.end_datetime|date:"d/m/Y" }}</div>
+        <small class="text-muted">{{ s.end_datetime|time:"H:i" }}</small>
+      </td>
+      <td><small>{{ s.purpose|truncatechars:50 }}</small></td>
+      <td>
+        {% if s.status == 'confirmed' %}<span class="badge bg-success px-2 py-1" style="border-radius:6px;">Confirmado</span>
+        {% elif s.status == 'pending' %}<span class="badge bg-warning text-dark px-2 py-1" style="border-radius:6px;">Pendente</span>
+        {% elif s.status == 'cancelled' %}<span class="badge bg-secondary px-2 py-1" style="border-radius:6px;">Cancelado</span>
+        {% elif s.status == 'completed' %}<span class="badge bg-info px-2 py-1" style="border-radius:6px;">Concluído</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if s.status == 'confirmed' and s.user == request.user %}
+        <a href="{% url 'schedules:schedule_cancel' s.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2" title="Cancelar">
+          <i class="fas fa-times"></i>
+        </a>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center py-5 text-muted">
+      <i class="fas fa-calendar-times fa-2x d-block mb-2 opacity-25"></i>
+      Nenhum agendamento encontrado.
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

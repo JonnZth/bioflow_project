@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ reagent.name }}{% endblock %}
+{% block page_title %}{{ reagent.name }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'reagents:reagent_edit' reagent.pk %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit me-1"></i>Editar</a>
+<a href="{% url 'inventory:movement_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-exchange-alt me-1"></i>Movimentar</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+<div class="col-lg-8">
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-sm-6"><small class="text-muted">Categoria</small><div class="fw-semibold">{{ reagent.get_category_display }}</div></div>
+                <div class="col-sm-6"><small class="text-muted">Fabricante</small><div class="fw-semibold">{{ reagent.manufacturer }}</div></div>
+                <div class="col-sm-6"><small class="text-muted">Lote</small><div class="fw-semibold"><code>{{ reagent.lot }}</code></div></div>
+                <div class="col-sm-6"><small class="text-muted">Validade</small>
+                    <div class="fw-semibold {% if reagent.is_expired %}text-danger{% elif reagent.is_expiring_soon %}text-warning{% endif %}">
+                        {{ reagent.expiration_date|date:"d/m/Y" }}
+                        {% if reagent.is_expired %}<span class="badge badge-expired ms-1">Vencido</span>{% elif reagent.is_expiring_soon %}<span class="badge badge-expiring ms-1">Vencendo</span>{% endif %}
+                    </div>
+                </div>
+                <div class="col-sm-6"><small class="text-muted">Quantidade</small>
+                    <div class="fw-semibold {% if reagent.is_low_stock %}text-warning{% endif %}">
+                        {{ reagent.quantity }} {{ reagent.unit }}
+                        {% if reagent.is_low_stock %}<i class="fas fa-exclamation-circle text-warning ms-1"></i>{% endif %}
+                    </div>
+                </div>
+                <div class="col-sm-6"><small class="text-muted">Fornecedor</small><div class="fw-semibold">{{ reagent.supplier }}</div></div>
+                <div class="col-sm-6"><small class="text-muted">Localização</small><div class="fw-semibold">{{ reagent.location }}</div></div>
+                {% if reagent.cas_number %}<div class="col-sm-6"><small class="text-muted">CAS</small><div class="fw-semibold"><code>{{ reagent.cas_number }}</code></div></div>{% endif %}
+                {% if reagent.safety_notes %}<div class="col-12"><small class="text-muted">Notas de Segurança</small><div class="mt-1 p-3 bg-light rounded">{{ reagent.safety_notes }}</div></div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+        <div class="card-header bg-white px-4 py-3"><strong>Últimas Movimentações</strong></div>
+        <div class="card-body p-0">
+            {% if movements %}
+            <div class="list-group list-group-flush">
+            {% for m in movements %}
+            <div class="list-group-item px-4 py-2">
+                <div class="d-flex justify-content-between">
+                    <small>{{ m.get_movement_type_display }}</small>
+                    <small class="{% if m.movement_type == 'entry' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                        {% if m.movement_type == 'entry' %}+{% else %}-{% endif %}{{ m.quantity }}
+                    </small>
+                </div>
+                <small class="text-muted">{{ m.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            {% endfor %}
+            </div>
+            {% else %}<div class="text-center py-3 text-muted small">Sem movimentações</div>{% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

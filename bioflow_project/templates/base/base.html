@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BioFlow{% endblock %} — BioFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #94a3b8;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #0d6efd;
+            --topbar-bg: #ffffff;
+            --content-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --sidebar-width: 260px;
+        }
+        body { background: var(--content-bg); font-family: 'Segoe UI', sans-serif; }
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width); background: var(--sidebar-bg);
+            height: 100vh; position: fixed; top: 0; left: 0; z-index: 1000;
+            display: flex; flex-direction: column; transition: width .3s;
+            overflow-x: hidden;
+        }
+        .sidebar-brand {
+            padding: 1.5rem 1.25rem; border-bottom: 1px solid #1e293b;
+            display: flex; align-items: center; gap: .75rem;
+        }
+        .sidebar-brand .brand-icon {
+            width: 38px; height: 38px; background: var(--primary);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.1rem; color: #fff; flex-shrink: 0;
+        }
+        .sidebar-brand .brand-text { color: #f8fafc; font-weight: 700; font-size: 1.2rem; }
+        .sidebar-brand .brand-sub { color: var(--sidebar-text); font-size: .7rem; }
+        .sidebar-nav { padding: 1rem 0; flex: 1; overflow-y: auto; }
+        .nav-section-title {
+            color: #475569; font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .1em;
+            padding: .75rem 1.25rem .25rem;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .6rem 1.25rem; color: var(--sidebar-text);
+            text-decoration: none; border-radius: 0; transition: all .2s;
+            font-size: .875rem;
+        }
+        .sidebar-link:hover { background: var(--sidebar-hover); color: #f1f5f9; }
+        .sidebar-link.active { background: var(--sidebar-active); color: #fff; }
+        .sidebar-link i { width: 18px; text-align: center; flex-shrink: 0; }
+        .sidebar-footer {
+            padding: 1rem 1.25rem; border-top: 1px solid #1e293b;
+        }
+        .user-card {
+            display: flex; align-items: center; gap: .75rem;
+            background: #1e293b; border-radius: 10px; padding: .75rem;
+        }
+        .user-avatar {
+            width: 36px; height: 36px; background: var(--primary);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: #fff; font-weight: 700;
+            font-size: .9rem; flex-shrink: 0;
+        }
+        .user-name { color: #f1f5f9; font-size: .8rem; font-weight: 600; }
+        .user-role { color: var(--sidebar-text); font-size: .7rem; }
+        /* Main */
+        #main { margin-left: var(--sidebar-width); min-height: 100vh; }
+        .topbar {
+            background: var(--topbar-bg); border-bottom: 1px solid #e2e8f0;
+            padding: .75rem 1.5rem; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 900;
+        }
+        .page-title { font-weight: 700; font-size: 1.1rem; color: #0f172a; margin: 0; }
+        .content-area { padding: 1.5rem; }
+        /* Cards */
+        .stat-card {
+            background: var(--card-bg); border-radius: 12px;
+            padding: 1.25rem; border: 1px solid #e2e8f0;
+            transition: box-shadow .2s;
+        }
+        .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+        }
+        .stat-value { font-size: 2rem; font-weight: 800; color: #0f172a; }
+        .stat-label { color: #64748b; font-size: .8rem; }
+        /* Badges e alerts */
+        .badge-expired { background: #fee2e2; color: #dc2626; }
+        .badge-expiring { background: #fef3c7; color: #d97706; }
+        .badge-low { background: #e0f2fe; color: #0284c7; }
+        /* Table */
+        .bioflow-table { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .bioflow-table thead { background: #f8fafc; }
+        .bioflow-table thead th { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        /* Alerts */
+        .alert { border-radius: 10px; border: none; }
+        /* Btn */
+        .btn { border-radius: 8px; font-weight: 500; }
+        /* Form */
+        .form-label { font-weight: 600; font-size: .85rem; color: #374151; }
+        .form-control, .form-select { border-radius: 8px; border-color: #d1d5db; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,110,253,.1); }
+        /* Status badges */
+        .status-available { background: #dcfce7; color: #16a34a; }
+        .status-in_use { background: #dbeafe; color: #2563eb; }
+        .status-maintenance { background: #fef3c7; color: #d97706; }
+        .status-broken { background: #fee2e2; color: #dc2626; }
+        .status-planning { background: #f3e8ff; color: #7c3aed; }
+        .status-in_progress { background: #dbeafe; color: #2563eb; }
+        .status-completed { background: #dcfce7; color: #16a34a; }
+        .status-cancelled { background: #f1f5f9; color: #64748b; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- Sidebar -->
+<div id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-flask"></i></div>
+        <div>
+            <div class="brand-text">BioFlow</div>
+            <div class="brand-sub">Laboratório Biotecnológico</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a href="{% url 'dashboard:index' %}" class="sidebar-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+
+        <div class="nav-section-title">Laboratório</div>
+        <a href="{% url 'experiments:experiment_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'experiments' %}active{% endif %}">
+            <i class="fas fa-microscope"></i> Experimentos
+        </a>
+        <a href="{% url 'analysis:analysis_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'analysis' %}active{% endif %}">
+            <i class="fas fa-chart-bar"></i> Análises
+        </a>
+        <a href="{% url 'protocols:protocol_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'protocols' %}active{% endif %}">
+            <i class="fas fa-file-alt"></i> Protocolos
+        </a>
+        <a href="{% url 'samples:sample_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'samples' %}active{% endif %}">
+            <i class="fas fa-vial"></i> Amostras
+        </a>
+
+        <div class="nav-section-title">Infraestrutura</div>
+        <a href="{% url 'equipments:equipment_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'equipments' %}active{% endif %}">
+            <i class="fas fa-tools"></i> Equipamentos
+        </a>
+        <a href="{% url 'schedules:schedule_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'schedules' %}active{% endif %}">
+            <i class="fas fa-calendar-alt"></i> Agendamentos
+        </a>
+
+        <div class="nav-section-title">Estoque</div>
+        <a href="{% url 'reagents:reagent_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'reagents' %}active{% endif %}">
+            <i class="fas fa-atom"></i> Reagentes
+        </a>
+        <a href="{% url 'inventory:movement_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}">
+            <i class="fas fa-boxes"></i> Movimentações
+        </a>
+
+        {% if user.is_admin %}
+        <div class="nav-section-title">Administração</div>
+        <a href="{% url 'accounts:user_list' %}" class="sidebar-link {% if request.resolver_match.app_name == 'accounts' and 'user' in request.path %}active{% endif %}">
+            <i class="fas fa-users"></i> Usuários
+        </a>
+        <a href="/api/" class="sidebar-link">
+            <i class="fas fa-code"></i> API REST
+        </a>
+        {% endif %}
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar">{{ user.username|first|upper }}</div>
+            <div>
+                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="user-role">{{ user.get_role_display }}</div>
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-2">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-secondary flex-fill" style="font-size:.75rem;">
+                <i class="fas fa-cog"></i> Perfil
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger flex-fill" style="font-size:.75rem;">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="main">
+    <div class="topbar">
+        <h1 class="page-title">{% block page_title %}BioFlow{% endblock %}</h1>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-muted" style="font-size:.8rem;"><i class="fas fa-calendar me-1"></i>{% now "d/m/Y" %}</span>
+            {% block topbar_actions %}{% endblock %}
+        </div>
+    </div>
+    <div class="content-area">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

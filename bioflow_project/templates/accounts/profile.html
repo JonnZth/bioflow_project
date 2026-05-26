@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% block title %}Meu Perfil{% endblock %}
+{% block page_title %}<i class="fas fa-user-circle me-2 text-primary"></i>Meu Perfil{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card text-center" style="border-radius:16px;border:1px solid #e2e8f0;">
+      <div class="card-body p-4">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,#0d6efd,#0284c7);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:2rem;margin:0 auto 1rem;">
+          {{ user.username|first|upper }}
+        </div>
+        <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
+        <p class="text-muted mb-2">@{{ user.username }}</p>
+        {% if user.role == 'admin' %}<span class="badge bg-danger px-3 py-2">Administrador</span>
+        {% elif user.role == 'researcher' %}<span class="badge bg-primary px-3 py-2">Pesquisador</span>
+        {% elif user.role == 'technician' %}<span class="badge bg-warning text-dark px-3 py-2">Técnico</span>
+        {% else %}<span class="badge bg-secondary px-3 py-2">Visitante</span>{% endif %}
+        <hr>
+        <div class="text-start">
+          <div class="mb-2"><small class="text-muted">E-mail</small><div class="fw-semibold">{{ user.email|default:"—" }}</div></div>
+          <div class="mb-2"><small class="text-muted">Telefone</small><div class="fw-semibold">{{ user.phone|default:"—" }}</div></div>
+          <div class="mb-2"><small class="text-muted">Instituição</small><div class="fw-semibold">{{ user.institution|default:"—" }}</div></div>
+          <div><small class="text-muted">Membro desde</small><div class="fw-semibold">{{ user.date_joined|date:"d/m/Y" }}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card" style="border-radius:16px;border:1px solid #e2e8f0;">
+      <div class="card-header bg-white px-4 py-3 border-bottom"><strong>Editar Dados</strong></div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for field in form %}
+            <div class="col-md-6">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors.as_text }}</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary mt-3 px-4"><i class="fas fa-save me-2"></i>Salvar Alterações</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+{% block title %}Usuários{% endblock %}
+{% block page_title %}<i class="fas fa-users me-2 text-primary"></i>Gerenciamento de Usuários{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-user-plus me-1"></i>Novo Usuário</a>
+{% endblock %}
+{% block content %}
+<div class="bioflow-table">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr><th>Usuário</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Instituição</th><th>Criado em</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+    <tr>
+      <td>
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:32px;height:32px;background:#0d6efd;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0;">
+            {{ u.username|first|upper }}
+          </div>
+          <code>{{ u.username }}</code>
+        </div>
+      </td>
+      <td>{{ u.get_full_name|default:"—" }}</td>
+      <td><small class="text-muted">{{ u.email|default:"—" }}</small></td>
+      <td>
+        {% if u.role == 'admin' %}<span class="badge bg-danger px-2 py-1" style="border-radius:6px;">Administrador</span>
+        {% elif u.role == 'researcher' %}<span class="badge bg-primary px-2 py-1" style="border-radius:6px;">Pesquisador</span>
+        {% elif u.role == 'technician' %}<span class="badge bg-warning text-dark px-2 py-1" style="border-radius:6px;">Técnico</span>
+        {% else %}<span class="badge bg-secondary px-2 py-1" style="border-radius:6px;">Visitante</span>{% endif %}
+      </td>
+      <td><small class="text-muted">{{ u.institution|default:"—" }}</small></td>
+      <td><small class="text-muted">{{ u.date_joined|date:"d/m/Y" }}</small></td>
+      <td>
+        <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+          <i class="fas fa-edit"></i>
+        </a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center py-4 text-muted">Nenhum usuário encontrado.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

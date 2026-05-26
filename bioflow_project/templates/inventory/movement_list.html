@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+{% block title %}Movimentações de Estoque{% endblock %}
+{% block page_title %}<i class="fas fa-boxes me-2 text-primary"></i>Movimentações de Estoque{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'inventory:movement_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Registrar Movimentação</a>
+{% endblock %}
+{% block content %}
+<div class="bioflow-table">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Reagente</th><th>Tipo</th><th>Quantidade</th>
+        <th>Anterior → Novo</th><th>Motivo</th><th>Experimento</th>
+        <th>Usuário</th><th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for m in movements %}
+    <tr>
+      <td>
+        <a href="{% url 'reagents:reagent_detail' m.reagent.pk %}" class="text-primary fw-semibold text-decoration-none">
+          {{ m.reagent.name }}
+        </a>
+      </td>
+      <td>
+        {% if m.movement_type == 'entry' %}
+          <span class="badge bg-success px-2 py-1" style="border-radius:6px;"><i class="fas fa-arrow-up me-1"></i>Entrada</span>
+        {% elif m.movement_type == 'exit' %}
+          <span class="badge bg-danger px-2 py-1" style="border-radius:6px;"><i class="fas fa-arrow-down me-1"></i>Saída</span>
+        {% elif m.movement_type == 'adjustment' %}
+          <span class="badge bg-info px-2 py-1" style="border-radius:6px;">Ajuste</span>
+        {% else %}
+          <span class="badge bg-warning text-dark px-2 py-1" style="border-radius:6px;">Descarte</span>
+        {% endif %}
+      </td>
+      <td>
+        <span class="fw-bold {% if m.movement_type == 'entry' %}text-success{% elif m.movement_type == 'exit' %}text-danger{% endif %}">
+          {% if m.movement_type == 'entry' or m.movement_type == 'adjustment' %}+{% else %}-{% endif %}{{ m.quantity }} {{ m.reagent.unit }}
+        </span>
+      </td>
+      <td>
+        <small class="text-muted">{{ m.previous_quantity }} → </small>
+        <span class="fw-semibold">{{ m.new_quantity }} {{ m.reagent.unit }}</span>
+      </td>
+      <td><small class="text-muted">{{ m.reason|truncatechars:40|default:"—" }}</small></td>
+      <td>
+        {% if m.experiment %}
+        <a href="{% url 'experiments:experiment_detail' m.experiment.pk %}" class="small text-primary text-decoration-none">
+          {{ m.experiment.title|truncatechars:25 }}
+        </a>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+      </td>
+      <td><small>{{ m.performed_by.username|default:"—" }}</small></td>
+      <td><small class="text-muted">{{ m.created_at|date:"d/m/Y H:i" }}</small></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8" class="text-center py-5 text-muted">
+      <i class="fas fa-boxes fa-2x d-block mb-2 opacity-25"></i>Nenhuma movimentação registrada.
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

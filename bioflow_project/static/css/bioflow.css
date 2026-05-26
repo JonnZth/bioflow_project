@@ -1,0 +1,73 @@
+/* BioFlow — Custom Styles */
+:root {
+    --primary: #0d6efd;
+    --primary-dark: #0a58ca;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --info: #0284c7;
+    --sidebar-width: 260px;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Transições suaves */
+.btn, .card, .badge, .list-group-item { transition: all 0.15s ease; }
+
+/* Hover em cards */
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+/* Form controls mais polidos */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.9rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+}
+
+/* Badges de alerta */
+.badge-expired { background: #fee2e2; color: #dc2626; font-size: .75rem; }
+.badge-expiring { background: #fef3c7; color: #d97706; font-size: .75rem; }
+.badge-low { background: #e0f2fe; color: #0284c7; font-size: .75rem; }
+
+/* Status dos equipamentos */
+.status-available { background: #dcfce7 !important; color: #16a34a !important; }
+.status-in_use { background: #dbeafe !important; color: #2563eb !important; }
+.status-maintenance { background: #fef3c7 !important; color: #d97706 !important; }
+.status-broken { background: #fee2e2 !important; color: #dc2626 !important; }
+.status-inactive { background: #f1f5f9 !important; color: #64748b !important; }
+
+/* Status dos experimentos */
+.status-planning { background: #f3e8ff !important; color: #7c3aed !important; }
+.status-in_progress { background: #dbeafe !important; color: #2563eb !important; }
+.status-paused { background: #fef3c7 !important; color: #d97706 !important; }
+.status-completed { background: #dcfce7 !important; color: #16a34a !important; }
+.status-cancelled { background: #f1f5f9 !important; color: #64748b !important; }
+
+/* Tooltip personalizado */
+[title] { cursor: help; }
+
+/* Sidebar responsiva */
+@media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.show { transform: translateX(0); }
+    #main { margin-left: 0; }
+}
+
+/* Animação fade-in para o conteúdo */
+.content-area { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Tabela zebrada limpa */
+.bioflow-table tbody tr:hover { background: #f8fafc; }
+
+/* Stat card hover */
+.stat-card:hover .stat-value { color: var(--primary); }
