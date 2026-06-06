@@ -7,6 +7,7 @@
 {% block content %}
 <div class="row g-3">
   <div class="col-lg-8">
+    <!-- Dados da amostra -->
     <div class="card mb-3" style="border-radius:12px;border:1px solid #e2e8f0;">
       <div class="card-header bg-white px-4 py-3 border-bottom">
         <div class="d-flex gap-3 align-items-center">
@@ -52,9 +53,36 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-lg-4">
+
+    <!-- Atualizar Status -->
     <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-header bg-white px-4 py-3 border-bottom">
+        <strong><i class="fas fa-exchange-alt me-2 text-primary"></i>Atualizar Status</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" action="{% url 'samples:sample_update_status' sample.pk %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <label class="form-label">Novo Status <span class="text-danger">*</span></label>
+              {{ tracking_form.status }}
+            </div>
+            <div class="col-sm-8">
+              <label class="form-label">Observação</label>
+              {{ tracking_form.notes }}
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3 px-4">
+            <i class="fas fa-save me-2"></i>Registrar Mudança
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rastreabilidade -->
+  <div class="col-lg-4">
+    <div class="card mb-3" style="border-radius:12px;border:1px solid #e2e8f0;">
       <div class="card-body p-4">
         <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size:.7rem;letter-spacing:.08em;">Rastreamento</h6>
         <div class="mb-3">
@@ -76,6 +104,37 @@
           <small class="text-muted">Nenhum experimento vinculado</small>
         {% endif %}
         {% endwith %}
+      </div>
+    </div>
+
+    <!-- Histórico de rastreabilidade -->
+    <div class="card" style="border-radius:12px;border:1px solid #e2e8f0;">
+      <div class="card-header bg-white px-4 py-3 border-bottom">
+        <strong><i class="fas fa-history me-2 text-primary"></i>Histórico</strong>
+      </div>
+      <div class="card-body p-0">
+        {% if tracking %}
+        <div style="max-height:360px;overflow-y:auto;">
+        {% for t in tracking %}
+        <div class="px-4 py-3 {% if not forloop.last %}border-bottom{% endif %}">
+          <div class="d-flex align-items-start gap-2">
+            <div style="width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;
+              background:{% if t.status == 'active' %}#22c55e{% elif t.status == 'consumed' %}#f59e0b{% elif t.status == 'discarded' %}#ef4444{% else %}#94a3b8{% endif %};">
+            </div>
+            <div>
+              <div class="fw-semibold small">{{ t.get_status_display }}</div>
+              <div class="text-muted" style="font-size:.75rem;">
+                {{ t.timestamp|date:"d/m/Y H:i" }} · {{ t.changed_by.get_full_name|default:t.changed_by.username|default:"—" }}
+              </div>
+              {% if t.notes %}<div class="mt-1 text-muted small">{{ t.notes }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted small">Sem eventos de rastreamento.</div>
+        {% endif %}
       </div>
     </div>
   </div>
