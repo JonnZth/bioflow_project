@@ -1,27 +1,16 @@
 from django import forms
-from .models import Protocol, ProtocolHistory
+from .models import Protocolo
 
-
-class ProtocolForm(forms.ModelForm):
+class ProtocoloForm(forms.ModelForm):
     class Meta:
-        model = Protocol
-        fields = ['title', 'description', 'category', 'version', 'pdf_file', 'is_active']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            if name == 'is_active':
-                field.widget.attrs['class'] = 'form-check-input'
-            else:
-                field.widget.attrs['class'] = 'form-control'
-
-
-class ProtocolHistoryForm(forms.ModelForm):
-    class Meta:
-        model = ProtocolHistory
-        fields = ['version', 'change_description']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+        model = Protocolo
+        # Definimos quais campos da tabela vão aparecer na tela para o usuário preencher
+        fields = ['titulo', 'descricao', 'categoria', 'documento']
+        
+        # Opcional: Adiciona classes do Bootstrap para ficar bonito depois
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+            'documento': forms.FileInput(attrs={'class': 'form-control'}),
+        }
