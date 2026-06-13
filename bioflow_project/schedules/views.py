@@ -1,85 +1,35 @@
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-
+from django.core.exceptions import ValidationError
 from .models import Schedule
 from .forms import ScheduleForm
 
-
 @login_required
 def schedule_list(request):
-    schedules = Schedule.objects.all()
-
-    return render(
-        request,
-        'schedules/schedule_list.html',
-        {'schedules': schedules}
-    )
-
+    qs=Schedule.objects.select_related('equipment','user').order_by('start_datetime')
+    eq=request.GET.get('equipment','')
+    if eq: qs=qs.filter(equipment__name__icontains=eq)
+    return render(request,'schedules/schedule_list.html',{'schedules':qs,'equipment':eq})
 
 @login_required
 def schedule_create(request):
-
-    if request.method == 'POST':
-        form = ScheduleForm(request.POST)
-
-        if form.is_valid():
-            schedule = form.save(commit=False)
-            schedule.user = request.user
-            schedule.save()
-
-            messages.success(
-                request,
-                'Agendamento criado com sucesso.'
-            )
-
-            return redirect('schedule_list')
-
-    else:
-        form = ScheduleForm()
-
-    return render(
-        request,
-        'schedules/schedule_form.html',
-        {'form': form}
-    )
-
+    form=ScheduleForm(request.POST or None)
+    if request.method=='POST' and form.is_valid():
+        s=form.save(commit=False); s.user=request.user
+        try:
+            s.full_clean(); s.save()
+            messages.success(request,'Agendamento realizado!')
+            return redirect('schedules:schedule_list')
+        except ValidationError as e:
+            messages.error(request,str(e.message))
+    return render(request,'schedules/schedule_form.html',{'form':form,'title':'Novo Agendamento'})
 
 @login_required
-def schedule_detail(request, pk):
-
-    schedule = get_object_or_404(
-        Schedule,
-        pk=pk
-    )
-
-    return render(
-        request,
-        'schedules/schedule_detail.html',
-        {'schedule': schedule}
-    )
-
-
-@login_required
-def schedule_delete(request, pk):
-
-    schedule = get_object_or_404(
-        Schedule,
-        pk=pk
-    )
-
-    if request.method == 'POST':
-        schedule.delete()
-
-        messages.success(
-            request,
-            'Agendamento removido com sucesso.'
-        )
-
-        return redirect('schedule_list')
-
-    return render(
-        request,
-        'schedules/schedule_delete.html',
-        {'schedule': schedule}
-    )
+def schedule_cancel(request,pk):
+    s=get_object_or_404(Schedule,pk=pk,user=request.user)
+    if request.method=='POST':
+        s.status='cancelled'; s.save()
+        messages.info(request,'Agendamento cancelado.')
+        return redirect('schedules:schedule_list')
+    return render(request,'schedules/schedule_confirm_cancel.html',{'schedule':s})

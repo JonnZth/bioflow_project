@@ -1,30 +1,9 @@
 from django.contrib import admin
-from .models import Schedule
-
-
-@admin.register(Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
-
-    list_display = (
-        'equipment',
-        'user',
-        'start_datetime',
-        'end_datetime',
-        'status'
-    )
-
-    list_filter = (
-        'status',
-        'equipment',
-        'start_datetime'
-    )
-
-    search_fields = (
-        'equipment__name',
-        'user__username',
-        'purpose'
-    )
-
-    ordering = (
-        'start_datetime',
-    )
+from . import models
+for name in dir(models):
+    cls = getattr(models, name)
+    try:
+        if issubclass(cls, models.models.Model) and cls._meta.app_label == 'schedules':
+            admin.site.register(cls)
+    except TypeError:
+        pass
