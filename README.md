@@ -1,11 +1,5 @@
 # BioFlow — Sistema Inteligente de Gestão de Laboratório Biotecnológico
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Django](https://img.shields.io/badge/Django-5.x-green)
-![DRF](https://img.shields.io/badge/API-Django%20REST%20Framework-red)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)
-![Status](https://img.shields.io/badge/status-acad%C3%AAmico-informational)
-
 ## Sobre o Projeto
 
 O **BioFlow** é uma aplicação web desenvolvida para centralizar as principais operações de um laboratório biotecnológico em um único sistema. A plataforma substitui registros em papel, planilhas dispersas e controles manuais por uma solução digital com rastreabilidade, organização e controle de acesso por perfil.
