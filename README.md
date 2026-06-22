@@ -23,7 +23,7 @@ O **BioFlow** resolve esses problemas ao reunir as informações em uma aplicaç
 | Camada | Tecnologias |
 |---|---|
 | Backend | Python 3.11, Django 5.x, Django REST Framework |
-| Frontend | HTML5, CSS3, Bootstrap 5.3, JavaScript, Chart.js |
+| Frontend | HTML5, CSS3, Bootstrap 5.3, Chart.js |
 | Banco de Dados | SQLite em ambiente de desenvolvimento |
 | Ferramentas | Git, GitHub, Postman |
 
