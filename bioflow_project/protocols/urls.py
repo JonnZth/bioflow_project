@@ -1,8 +1,9 @@
 from django.urls import path
 from . import views
-
-urlpatterns = [
-    path('', views.listar_protocolos, name='listar_protocolos'),
-    path('novo/', views.cadastrar_protocolo, name='cadastrar_protocolo'),
-    path('editar/<int:pk>/', views.editar_protocolo, name='editar_protocolo'),
+app_name='protocols'
+urlpatterns=[
+    path('',views.protocol_list,name='protocol_list'),
+    path('<int:pk>/',views.protocol_detail,name='protocol_detail'),
+    path('new/',views.protocol_create,name='protocol_create'),
+    path('<int:pk>/edit/',views.protocol_edit,name='protocol_edit'),
 ]

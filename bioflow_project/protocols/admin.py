@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Categoria, Protocolo
-
-# Registrando as tabelas para elas aparecerem no painel do administrador
-admin.site.register(Categoria)
-admin.site.register(Protocolo)
+from . import models
+for name in dir(models):
+    cls = getattr(models, name)
+    try:
+        if issubclass(cls, models.models.Model) and cls._meta.app_label == 'protocols':
+            admin.site.register(cls)
+    except TypeError:
+        pass

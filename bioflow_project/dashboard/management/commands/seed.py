@@ -179,6 +179,7 @@ class Command(BaseCommand):
         self.amostras = []
         for nm, tipo, resp, dias, armazen, status in dados:
             s = Sample.objects.create(
+                code=f"SMP-{len(self.amostras)+1:04d}",
                 name=nm, sample_type=tipo, responsible=resp,
                 collection_date=date.today() + timedelta(days=dias),
                 storage_location=armazen, status=status,
